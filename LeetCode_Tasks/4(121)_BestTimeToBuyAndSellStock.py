@@ -29,4 +29,4 @@ class Solution(object):
 
 prices = [7, 5, 3, 6, 4, 1]
 sol = Solution()
-print(sol.maxProfit(prices))
+print(sol.maxProfit2(prices))
