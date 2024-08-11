@@ -20,9 +20,7 @@ class SingleLinkedList:
     """This class defines the functionality of a single linked list"""
 
     def __init__(self) -> None:
-        """
-        Initialize an empty single linked list.
-        """
+        """Initialize an empty single linked list."""
         self.head = None  # Pointer to the first node in the list
         self.tail = None  # Pointer to the last node in the list
 
@@ -38,49 +36,30 @@ class SingleLinkedList:
             print("None")  # Indicates the end of the list
 
     def append(self, value: int):
-        """
-        Append a value to the end of the single linked list.
-
-        Args:
-            value: The value to append to the list.
-        """
+        """Append a value to the end of the single linked list."""
         new_node = SingleLinkNode(
             value)  # Create a new node with the given value
 
         if self.head is None:  # If the list is empty
-            # The new node becomes both the head and the tail
-            self.head = new_node
-            self.tail = new_node
+            self.head = new_node  # The new node becomes the head
+            self.tail = new_node  # The new node also becomes the tail
         else:
-            # Link the current tail to the new node
-            self.tail.next = new_node
-            # Update the tail to be the new node
-            self.tail = new_node
+            self.tail.next = new_node  # Link the current tail to the new node
+            self.tail = new_node  # Update the tail to the new node
 
     def insert(self, value: int, index: int):
-        """
-        Insert a value at the specified index in the list.
-
-        Args:
-            value: The value to insert into the list.
-            index: The position at which to insert the value. Indexing starts at 0.
-
-        Raises:
-            IndexError: If the index is out of the bounds of the list or is negative.
-        """
+        """Insert a value at the specified index in the list."""
         if index < 0:
             raise IndexError("Index must be a non-negative integer.")
 
         if self.head is None:  # If the list is empty
             if index == 0:
-                # Insert the new node at the head
+                # Insert at the head if index is 0
                 self.head = SingleLinkNode(value)
-                # Since it's the only node, update the tail as well
-                self.tail = self.head
+                self.tail = self.head  # Since it's the only node, it becomes the tail
             else:
                 raise IndexError(
-                    "List is empty, so the only valid index is 0."
-                )
+                    "List is empty, so the only valid index is 0.")
             return
 
         if index == 0:  # Insert at the head of the list
@@ -94,69 +73,110 @@ class SingleLinkedList:
         # Traverse the list to find the correct position
         while current:
             if counter == index - 1:
-                # Insert the new node at the desired index
                 new_node = SingleLinkNode(value, current.next)
                 current.next = new_node
 
-                # If inserting at the end, update the tail
-                if new_node.next is None:
+                if new_node.next is None:  # If inserting at the end, update the tail
                     self.tail = new_node
                 return
 
             current = current.next
             counter += 1
 
-        # If the index is beyond the end of the list
         raise IndexError("Index out of bounds.")
 
     def delete_element(self, index: int):
         """Delete element with selected index"""
-
-        # The case when we have negative index
         if index < 0:
             raise IndexError("Index must be a non-negative integer.")
 
-        # User cannot delete element from empty list
-        if self.head is None:
+        if self.head is None:  # If the list is empty
             raise IndexError("The list is empty")
 
-        # If we need to delete 0 index element
-        if index == 0:
+        if index == 0:  # Deleting the head
             self.head = self.head.next
-            if self.head is None:
-                return
-            if self.head.next is None:
-                self.tail = self.head
+            if self.head is None:  # If the list becomes empty after deletion
+                self.tail = None  # Update tail to None
             return
 
         current = self.head
         counter = 0
+
+        # Traverse the list to find the node just before the one to delete
         while current:
             if counter == index - 1:
-                element_after_deleted = (current.next).next
+                to_delete = current.next
+                if to_delete is None:
+                    raise IndexError("Index out of bounds.")
 
-                if element_after_deleted is None:
-                    self.tail = element_after_deleted
-                    current.next = element_after_deleted
-                    return
+                current.next = to_delete.next
 
-                if element_after_deleted is not None:
-                    current.next = element_after_deleted
-                    return
-                else:
-                    self.head = current
-                    self.tail = current
-                    return
+                if current.next is None:  # If the last node was deleted
+                    self.tail = current  # Update the tail to the previous node
+                return
 
+            current = current.next
+            counter += 1
 
-            # Testing the SingleLinkedList
-test = SingleLinkedList()
-test.append(5)
-test.append(10)
-test.print_all_values()
+        raise IndexError("Index out of bounds.")
 
-test.delete_element(0)
-test.delete_element(0)
-test.append(7)
-test.delete_element(0)
-test.print_all_values()
+    def merge_list_with_another(self, another_list):
+        """Merges two sorted lists"""
+        original_list = self.head
+        second_list = another_list.head
+
+        if original_list is None:  # If the original list is empty
+            self.head = second_list  # Just point to the second list
+            self.tail = another_list.tail
+            return
+
+        if second_list is None:  # If the second list is empty
+            return
+
+        dummy = SingleLinkNode(0)  # Dummy node to help build the merged list
+        new_list_tail = dummy
+
+        # Merge the two lists by comparing values
+        while original_list and second_list:
+            if original_list.value <= second_list.value:
+                new_list_tail.next = original_list
+                original_list = original_list.next
+            else:
+                new_list_tail.next = second_list
+                second_list = second_list.next
+            new_list_tail = new_list_tail.next
+
+        # If one list is exhausted, append the remaining elements of the other list
+        new_list_tail.next = original_list if original_list else second_list
+
+        self.head = dummy.next  # The head of the merged list
+
+        # Update the tail to the last node of the merged list
+        while new_list_tail.next:
+            new_list_tail = new_list_tail.next
+
+        self.tail = new_list_tail
+
+    def sort_list(self, order: bool = False):
+        """Sort the list in ascending or descending order."""
+        if self.head is None:
+            return
+
+        # Extract values from the linked list
+        current = self.head
+        values = []
+        while current:
+            values.append(current.value)  # Add each node's value to the list
+            current = current.next
+
+        # Sort the list in the desired order
+        # `order` determines ascending or descending
+        values.sort(reverse=order)
+
+        # Rebuild the linked list with sorted values
+        current = self.head
+        for value in values:
+            current.value = value  # Update node's value with the sorted value
+            current = current.next
+
+        # No need to update self.tail since structure of linked list remains the same
