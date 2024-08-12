@@ -1,23 +1,22 @@
 """Creating single linked list functionality"""
 
 
-class SingleLinkNode:
-    """SingleLinkNode definition (one piece of the single linked list)"""
-
-    def __init__(self, value, next=None) -> None:
-        """
-        Initialize the node with a value and a pointer to the next node.
-
-        Args:
-            value: The value stored in this node.
-            next: The reference to the next node in the list. Defaults to None.
-        """
-        self.value = value
-        self.next = next
-
-
 class SingleLinkedList:
     """This class defines the functionality of a single linked list"""
+
+    class SingleLinkNode:
+        """Single node of the single linked list"""
+
+        def __init__(self, value, next=None) -> None:
+            """
+            Initialize the node with a value and a pointer to the next node.
+
+            Args:
+            value: The value stored in this node.
+            next: The reference to the next node in the list. Defaults to None.
+            """
+            self.value = value
+            self.next = next
 
     def __init__(self) -> None:
         """Initialize an empty single linked list."""
@@ -37,7 +36,7 @@ class SingleLinkedList:
 
     def append(self, value: int):
         """Append a value to the end of the single linked list."""
-        new_node = SingleLinkNode(
+        new_node = self.SingleLinkNode(
             value)  # Create a new node with the given value
 
         if self.head is None:  # If the list is empty
@@ -55,7 +54,7 @@ class SingleLinkedList:
         if self.head is None:  # If the list is empty
             if index == 0:
                 # Insert at the head if index is 0
-                self.head = SingleLinkNode(value)
+                self.head = self.SingleLinkNode(value)
                 self.tail = self.head  # Since it's the only node, it becomes the tail
             else:
                 raise IndexError(
@@ -63,7 +62,7 @@ class SingleLinkedList:
             return
 
         if index == 0:  # Insert at the head of the list
-            new_node = SingleLinkNode(value, self.head)
+            new_node = self.SingleLinkNode(value, self.head)
             self.head = new_node
             return
 
@@ -73,7 +72,7 @@ class SingleLinkedList:
         # Traverse the list to find the correct position
         while current:
             if counter == index - 1:
-                new_node = SingleLinkNode(value, current.next)
+                new_node = self.SingleLinkNode(value, current.next)
                 current.next = new_node
 
                 if new_node.next is None:  # If inserting at the end, update the tail
@@ -133,7 +132,8 @@ class SingleLinkedList:
         if second_list is None:  # If the second list is empty
             return
 
-        dummy = SingleLinkNode(0)  # Dummy node to help build the merged list
+        # Dummy node to help build the merged list
+        dummy = self.SingleLinkNode(0)
         new_list_tail = dummy
 
         # Merge the two lists by comparing values
@@ -180,3 +180,54 @@ class SingleLinkedList:
             current = current.next
 
         # No need to update self.tail since structure of linked list remains the same
+
+    def __getitem__(self, index: int):
+        """Overload the square brackets for getting a value by index."""
+        if index < 0:
+            raise IndexError("Index must be a non-negative integer.")
+
+        current = self.head
+        counter = 0
+
+        while current:
+            if counter == index:
+                return current.value
+            current = current.next
+            counter += 1
+
+        raise IndexError("Index out of bounds.")
+
+    def __setitem__(self, index: int, value):
+        """Overload the square brackets for setting a value by index."""
+        if index < 0:
+            raise IndexError("Index must be a non-negative integer.")
+
+        current = self.head
+        counter = 0
+
+        while current:
+            if counter == index:
+                current.value = value
+                return
+            current = current.next
+            counter += 1
+
+        raise IndexError("Index out of bounds.")
+
+    def __len__(self):
+        """Return the length of the list."""
+        current = self.head
+        count = 0
+        while current:
+            count += 1
+            current = current.next
+        return count
+
+    def __str__(self):
+        """Return a string representation of the list."""
+        elements = []
+        current = self.head
+        while current:
+            elements.append(str(current.value))
+            current = current.next
+        return " -> ".join(elements) + " -> None"
